@@ -1,149 +1,153 @@
-const STORAGE_KEY = "swipecard-live-demo-deck-v3";
-const LIVE_KEY = "swipecard-live-demo-state-v3";
-const channel = "BroadcastChannel" in window ? new BroadcastChannel("swipecard-live") : null;
+const STORAGE_KEY = "swipecard-live-demo-deck-v5";
+const LIVE_KEY = "swipecard-live-demo-state-v5";
+const CHANNEL_NAME = "swipecard-live-v5";
+const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
+
 const DEFAULT_TEXT_SIZES = {
     title: 114,
     body: 48,
     band: 60,
     memo: 48
 };
-const PREVIEW_FONT_SCALE = 0.38;
-const backgroundOptions = [
-    { label: "背景なし", value: "" }
+
+const PREVIEW_FONT_SCALE = 0.27;
+const MAX_ROWS = 12;
+const MAX_COLUMNS = 6;
+
+const demoCopy = [
+    {
+        title: "0→1営業支援ツール",
+        body: "名刺交換を営業の入口に変える\nスキルの見える化\n信用の見える化",
+        band: "学びと評価を\n自分の意思で営業資産に変える",
+        memo: "紙名刺や普通のプロフィールでは伝わらない\n実力と信頼を、その場で見せるための仕組みです。",
+        ctaEnabled: true,
+        ctaLabel: "詳しく見る",
+        ctaUrl: "#"
+    },
+    {
+        title: "SwipeCardとは",
+        body: "対面で説明しながら\n相手のスマホへ資料を届ける\n新しい営業の入口です。",
+        band: "横展開は大きなボタンで移動",
+        memo: "左右スワイプを使わず、迷わない操作を優先します。"
+    },
+    {
+        title: "学びはあるのに\n見せる形がない",
+        body: "講座を受けても\n卒業しても\n仕事につながる形で見せられない",
+        band: "実績が少ない人ほど\n不安が大きい",
+        memo: "何を見せれば仕事につながるのか。その空白を埋めます。"
+    },
+    {
+        title: "紙名刺だけでは伝わらない",
+        body: "実力・信頼・学びの履歴は\n小さな紙面だけでは残りません。",
+        band: "その場で見せる入口が必要です",
+        memo: "補足ページは左右のボタンで行き来します。"
+    },
+    {
+        title: "学びと評価を\n営業資産に変える",
+        body: "実績・評価・次の行動を\n1つのURLで見せます。",
+        band: "相手のスマホでも軽く表示",
+        memo: "完成WebPとHTMLテキストを組み合わせます。"
+    },
+    {
+        title: "Liveで同じページを見る",
+        body: "管理者がページを指定すると\n相手画面も同じ位置へ移動します。",
+        band: "対面プレゼンの一体感",
+        memo: "Live終了後は自由閲覧へ戻ります。"
+    },
+    {
+        title: "その場で次の約束へ",
+        body: "QR・URL共有から\nフォーム・電話・vCard保存へ。",
+        band: "説明から行動までを短くする",
+        memo: "CTAはページごとに表示・非表示を選べます。",
+        ctaEnabled: true,
+        ctaLabel: "相談する",
+        ctaUrl: "https://example.com"
+    },
+    {
+        title: "SwipeCard Demo",
+        body: "ここまでが縦4行・横2列の\n基本デモです。",
+        band: "管理画面から構成を変更できます",
+        memo: "縦行・横列を増減するとページ枠を自動調整します。"
+    }
 ];
 
-const demoDeck = {
-    id: "demo-deck",
-    title: "SwipeCard Demo",
-    pages: [
-        {
-            id: "fv",
-            group: "1",
-            label: "1",
-            title: "0→1営業支援ツール",
-            body: "名刺交換を営業の入口に変える\nスキルの見える化\n信用の見える化",
-            band: "紙名刺や普通のプロフィールでは伝わらない\n実力と信頼を、その場で見せるための仕組みです。",
-            memo: "SwipeCardは単なるWeb名刺ではない\n対面プレゼンのために",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: true,
-            ctaLabel: "詳しく見る",
-            ctaUrl: "#",
-            background: "",
-            align: "top"
-        },
-        {
-            id: "problem-image",
-            group: "2",
-            label: "2",
-            title: "学びはあるのに\n見せる形がない",
-            body: "講座を受けても\n卒業しても\nそれを仕事につながる形で\n見せられない人が多くいます",
-            band: "受講直後の\n「何を見せれば仕事につながるのか分からない」\nそれを埋めるのがこのサービスの役目",
-            memo: "実績が少ない\n人ほど\n不安が大きい",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: false,
-            ctaLabel: "",
-            ctaUrl: "",
-            background: "",
-            align: "top"
-        },
-        {
-            id: "problem-a",
-            group: "3",
-            label: "3-1",
-            title: "紙名刺だけでは伝わらない",
-            body: "実力・信頼・学びの履歴は、紙面だけでは残りません。\n対面で見せながら説明できる入口が必要です。",
-            band: "",
-            memo: "",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: true,
-            ctaLabel: "次の視点へ",
-            ctaUrl: "#",
-            background: "",
-            align: "top"
-        },
-        {
-            id: "problem-b",
-            group: "3",
-            label: "3-2",
-            title: "横展開はタップで迷わせない",
-            body: "横スワイプは不安定になりやすいため使いません。\n大きなボタンで、補足ページへ明確に移動します。",
-            band: "",
-            memo: "",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: true,
-            ctaLabel: "理解しました",
-            ctaUrl: "#",
-            background: "",
-            align: "top"
-        },
-        {
-            id: "proof",
-            group: "4",
-            label: "4",
-            title: "学びと評価を営業資産に変える",
-            body: "名刺交換後に、実績・評価・次の行動を1つのURLで見せます。\n相手のスマホでも軽く表示できる構成を優先します。",
-            band: "",
-            memo: "",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: true,
-            ctaLabel: "相談する",
-            ctaUrl: "https://example.com",
-            background: "",
-            align: "bottom"
-        },
-        {
-            id: "cta",
-            group: "4",
-            label: "4-2",
-            title: "その場で次の約束へ",
-            body: "QR / NFC / URL共有から、フォーム・電話・vCard保存へ。\nLive終了後は自由閲覧に戻ります。",
-            band: "",
-            memo: "",
-            titleSize: DEFAULT_TEXT_SIZES.title,
-            bodySize: DEFAULT_TEXT_SIZES.body,
-            bandSize: DEFAULT_TEXT_SIZES.band,
-            memoSize: DEFAULT_TEXT_SIZES.memo,
-            ctaEnabled: true,
-            ctaLabel: "vCardを保存",
-            ctaUrl: "#",
-            background: "",
-            align: "bottom"
-        }
-    ]
-};
-
+const demoDeck = createDeck(4, 2);
 let deck = loadDeck();
 let liveState = loadLiveState();
-let mode = new URLSearchParams(location.search).get("mode") || "preview";
+let currentView = new URLSearchParams(location.search).get("view") || "preview";
 let activePageId = liveState.currentPageId || deck.pages[0].id;
+let groupSelections = {};
+let backgroundOptions = [{ label: "背景なし", value: "" }];
+let scrollTimer = null;
 
+const views = {
+    preview: document.getElementById("previewView"),
+    admin: document.getElementById("adminView"),
+    editor: document.getElementById("editorView")
+};
 const deckViewport = document.getElementById("deckViewport");
-const livePanel = document.getElementById("livePanel");
-const cmsPanel = document.getElementById("cmsPanel");
-const liveStatusLabel = document.getElementById("liveStatusLabel");
-const deckTitleLabel = document.getElementById("deckTitleLabel");
-const viewerUrlText = document.getElementById("viewerUrlText");
+const qrDialog = document.getElementById("qrDialog");
+
+function createDeck(rows, columns) {
+    const pages = [];
+    for (let row = 1; row <= rows; row += 1) {
+        for (let column = 1; column <= columns; column += 1) {
+            pages.push(createPage(row, column, demoCopy[pages.length]));
+        }
+    }
+    return {
+        id: "demo-deck",
+        title: "SwipeCard Demo",
+        structure: { rows, columns },
+        pages
+    };
+}
+
+function createPage(row, column, source = {}) {
+    return {
+        id: `page-${row}-${column}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        group: String(row),
+        column,
+        label: column === 1 ? String(row) : `${row}-${column}`,
+        title: source.title || `ページ ${row}-${column}`,
+        body: source.body || "ここに本文を入力します。",
+        band: source.band || "",
+        memo: source.memo || "",
+        titleSize: source.titleSize || DEFAULT_TEXT_SIZES.title,
+        bodySize: source.bodySize || DEFAULT_TEXT_SIZES.body,
+        bandSize: source.bandSize || DEFAULT_TEXT_SIZES.band,
+        memoSize: source.memoSize || DEFAULT_TEXT_SIZES.memo,
+        ctaEnabled: Boolean(source.ctaEnabled),
+        ctaLabel: source.ctaLabel || "",
+        ctaUrl: source.ctaUrl || "",
+        background: source.background || "",
+        aspect: source.aspect || "5:7"
+    };
+}
+
+function normalizeDeck(value) {
+    const result = value && Array.isArray(value.pages) ? value : structuredClone(demoDeck);
+    result.structure ||= {};
+    const rows = clampNumber(result.structure.rows || Math.max(...result.pages.map((page) => Number(page.group) || 1)), 1, MAX_ROWS);
+    const columns = clampNumber(result.structure.columns || Math.max(...result.pages.map((page) => Number(page.column) || 1)), 1, MAX_COLUMNS);
+    result.structure = { rows, columns };
+    result.pages.forEach((page, index) => {
+        page.group = String(page.group || Math.floor(index / columns) + 1);
+        page.column = Number(page.column || (index % columns) + 1);
+        page.label = page.column === 1 ? page.group : `${page.group}-${page.column}`;
+        page.aspect ||= "5:7";
+        page.titleSize ||= DEFAULT_TEXT_SIZES.title;
+        page.bodySize ||= DEFAULT_TEXT_SIZES.body;
+        page.bandSize ||= DEFAULT_TEXT_SIZES.band;
+        page.memoSize ||= DEFAULT_TEXT_SIZES.memo;
+    });
+    return result;
+}
 
 function loadDeck() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return structuredClone(demoDeck);
     try {
-        return JSON.parse(saved);
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return normalizeDeck(saved ? JSON.parse(saved) : structuredClone(demoDeck));
     } catch {
         return structuredClone(demoDeck);
     }
@@ -155,25 +159,18 @@ function saveDeck() {
 }
 
 function loadLiveState() {
-    const saved = localStorage.getItem(LIVE_KEY);
-    if (!saved) {
-        return {
-            deckId: demoDeck.id,
-            currentPageId: demoDeck.pages[0].id,
-            presentationMode: false,
-            updatedAt: new Date().toISOString()
-        };
-    }
     try {
-        return JSON.parse(saved);
+        const saved = localStorage.getItem(LIVE_KEY);
+        if (saved) return JSON.parse(saved);
     } catch {
-        return {
-            deckId: demoDeck.id,
-            currentPageId: demoDeck.pages[0].id,
-            presentationMode: false,
-            updatedAt: new Date().toISOString()
-        };
+        // 初期値へフォールバックする。
     }
+    return {
+        deckId: demoDeck.id,
+        currentPageId: demoDeck.pages[0].id,
+        presentationMode: false,
+        updatedAt: new Date().toISOString()
+    };
 }
 
 function saveLiveState(nextState) {
@@ -184,166 +181,338 @@ function saveLiveState(nextState) {
     };
     localStorage.setItem(LIVE_KEY, JSON.stringify(liveState));
     broadcast({ type: "live-updated", state: liveState });
-    updateLiveStatus();
+    renderLiveStatus();
 }
 
 function broadcast(message) {
-    if (channel) channel.postMessage(message);
+    channel?.postMessage(message);
 }
 
-function groupedPages() {
-    return deck.pages.reduce((groups, page) => {
-        if (!groups.has(page.group)) groups.set(page.group, []);
-        groups.get(page.group).push(page);
-        return groups;
-    }, new Map());
+function orderedPages() {
+    return [...deck.pages].sort((a, b) => {
+        const groupDiff = Number(a.group) - Number(b.group);
+        return groupDiff || Number(a.column) - Number(b.column);
+    });
 }
 
-function currentPageForGroup(pages) {
-    if (pages.some((page) => page.id === activePageId)) {
-        return pages.find((page) => page.id === activePageId);
-    }
-    return pages[0];
+function pagesForRow(row) {
+    return orderedPages().filter((page) => Number(page.group) === Number(row));
+}
+
+function pageAt(row, column) {
+    return deck.pages.find((page) => Number(page.group) === Number(row) && Number(page.column) === Number(column));
+}
+
+function activePage() {
+    return deck.pages.find((page) => page.id === activePageId) || orderedPages()[0];
+}
+
+function selectedPageForRow(row) {
+    const pages = pagesForRow(row);
+    const selectedId = groupSelections[row];
+    return pages.find((page) => page.id === selectedId) || pages[0];
+}
+
+function renderAll() {
+    renderDeck();
+    renderAdmin();
+    renderEditorPageOptions();
+    fillEditorForm(activePageId);
+    renderLiveStatus();
 }
 
 function renderDeck() {
-    deckTitleLabel.textContent = deck.title;
-    const groups = groupedPages();
-    deckViewport.innerHTML = Array.from(groups.entries()).map(([groupId, pages], groupIndex) => {
-        const page = currentPageForGroup(pages);
-        const hasBackground = Boolean(page.background);
-        const style = hasBackground ? `style="background-image: url('${escapeAttribute(page.background)}')"` : "";
-        const sideNav = pages.length > 1 ? renderSideNav(groupId, pages, page.id) : "";
-        const verticalHint = groupIndex < groups.size - 1 ? `<div class="vertical-hint">下へスワイプ</div>` : "";
-        const hasCopy = Boolean(page.title || page.body || page.band || page.memo || (page.ctaEnabled !== false && page.ctaLabel));
-        const titleStyle = `style="font-size: ${previewFontSize(page.titleSize || DEFAULT_TEXT_SIZES.title)}px"`;
-        const bodyStyle = `style="font-size: ${previewFontSize(page.bodySize || DEFAULT_TEXT_SIZES.body)}px"`;
-        const bandStyle = `style="font-size: ${previewFontSize(page.bandSize || DEFAULT_TEXT_SIZES.band)}px"`;
-        const memoStyle = `style="font-size: ${previewFontSize(page.memoSize || DEFAULT_TEXT_SIZES.memo)}px"`;
-
+    document.getElementById("deckTitleLabel").textContent = deck.title;
+    const rows = Array.from({ length: deck.structure.rows }, (_, index) => index + 1);
+    deckViewport.innerHTML = rows.map((row) => {
+        const pages = pagesForRow(row);
+        const page = selectedPageForRow(row);
+        if (!page) return "";
+        const columnIndex = pages.findIndex((item) => item.id === page.id);
+        const isDetail = columnIndex > 0;
         return `
-            <article class="deck-row" data-group="${escapeAttribute(groupId)}" data-active-page="${escapeAttribute(page.id)}">
-                <section class="deck-card ${hasBackground ? "has-bg" : ""}" ${style}>
-                    ${hasCopy ? `
-                        <div class="deck-copy ${page.align === "bottom" ? "align-bottom" : ""}">
-                            ${page.title ? `<h2 ${titleStyle}>${escapeHtml(page.title)}</h2>` : ""}
-                            ${page.body ? `<p class="deck-body" ${bodyStyle}>${escapeHtml(page.body)}</p>` : ""}
-                            ${page.memo ? `<div class="deck-memo" ${memoStyle}>${escapeHtml(page.memo)}</div>` : ""}
-                            ${page.band ? `<div class="deck-band" ${bandStyle}>${escapeHtml(page.band)}</div>` : ""}
-                            ${page.ctaEnabled !== false && page.ctaLabel ? `<a class="cta-link" href="${escapeAttribute(page.ctaUrl || "#")}">${escapeHtml(page.ctaLabel)}</a>` : ""}
-                        </div>
-                    ` : ""}
-                    ${sideNav}
-                    ${verticalHint}
-                </section>
+            <article class="deck-row ${isDetail ? "horizontal-detail" : ""}" data-row="${row}" data-page-id="${escapeAttribute(page.id)}">
+                <div class="page-layout ${isDetail ? "no-vertical" : ""}">
+                    ${renderPageCard(page)}
+                    ${isDetail ? "" : renderVerticalNav(row, page)}
+                    ${pages.length > 1 ? renderHorizontalNav(pages, columnIndex, page) : ""}
+                </div>
             </article>
         `;
     }).join("");
-    renderPageControls();
-    renderCmsOptions();
-    updateLiveStatus();
 }
 
-function renderSideNav(groupId, pages, activeId) {
-    const index = pages.findIndex((page) => page.id === activeId);
-    const prev = pages[index - 1];
-    const next = pages[index + 1];
+function renderPageCard(page) {
+    const backgroundStyle = page.background ? `style="background-image:url('${escapeAttribute(page.background)}')"` : "";
     return `
-        <div class="side-nav" aria-label="横展開ページ移動">
-            <button type="button" ${prev ? "" : "disabled"} data-jump-page="${prev ? escapeAttribute(prev.id) : ""}">← 前の補足</button>
-            <button type="button" ${next ? "" : "disabled"} data-jump-page="${next ? escapeAttribute(next.id) : ""}">次の補足 →</button>
-        </div>
+        <section class="deck-card ${page.background ? "has-bg" : ""} ${page.aspect === "9:16" ? "aspect-9-16" : ""}" ${backgroundStyle}>
+            <div class="deck-copy">
+                ${page.title ? `<h2 class="deck-title" style="font-size:${previewFontSize(page.titleSize)}px">${escapeHtml(page.title)}</h2>` : ""}
+                ${page.body ? `<p class="deck-body" style="font-size:${previewFontSize(page.bodySize)}px">${escapeHtml(page.body)}</p>` : ""}
+                ${page.band ? `<div class="deck-band" style="font-size:${previewFontSize(page.bandSize)}px">${escapeHtml(page.band)}</div>` : ""}
+                ${page.ctaEnabled && page.ctaLabel ? `<a class="cta-link" href="${escapeAttribute(page.ctaUrl || "#")}">${escapeHtml(page.ctaLabel)}</a>` : ""}
+                ${page.memo ? `<div class="deck-memo" style="font-size:${previewFontSize(page.memoSize)}px">${escapeHtml(page.memo)}</div>` : ""}
+            </div>
+        </section>
     `;
 }
 
-function renderPageControls() {
-    const pageControlList = document.getElementById("pageControlList");
-    if (!pageControlList) return;
+function renderVerticalNav(row, page) {
+    return `
+        <nav class="vertical-nav" aria-label="縦ページ移動">
+            <button class="nav-arrow" type="button" data-row-move="-1" data-row="${row}" ${row <= 1 ? "disabled" : ""} aria-label="前の縦ページ">▲</button>
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span class="nav-current">${escapeHtml(page.label)}</span>
+            <span class="nav-dot" aria-hidden="true"></span>
+            <button class="nav-arrow" type="button" data-row-move="1" data-row="${row}" ${row >= deck.structure.rows ? "disabled" : ""} aria-label="次の縦ページ">▼</button>
+        </nav>
+    `;
+}
 
-    pageControlList.innerHTML = deck.pages.map((page) => `
-        <button type="button" class="${page.id === activePageId ? "active" : ""}" data-live-page="${escapeAttribute(page.id)}">
-            <span>${escapeHtml(page.label)}</span>
-            <strong>${escapeHtml(page.title)}</strong>
+function renderHorizontalNav(pages, columnIndex, page) {
+    return `
+        <nav class="horizontal-nav" aria-label="横補足ページ移動">
+            <button class="nav-arrow" type="button" data-horizontal-page="${pages[columnIndex - 1]?.id || ""}" ${columnIndex === 0 ? "disabled" : ""} aria-label="左のページ">◀</button>
+            <span class="nav-dot" aria-hidden="true"></span>
+            <span class="nav-current">${escapeHtml(page.label)}</span>
+            <span class="nav-dot" aria-hidden="true"></span>
+            <button class="nav-arrow" type="button" data-horizontal-page="${pages[columnIndex + 1]?.id || ""}" ${columnIndex >= pages.length - 1 ? "disabled" : ""} aria-label="右のページ">▶</button>
+        </nav>
+    `;
+}
+
+function renderAdmin() {
+    const page = activePage();
+    document.getElementById("adminPageTitle").textContent = page.title || "無題のページ";
+    document.getElementById("adminPageLabel").textContent = page.label;
+    document.getElementById("structureSummary").textContent = `縦${deck.structure.rows} × 横${deck.structure.columns}`;
+    renderMiniPreview(document.getElementById("adminPreview"), page);
+
+    const grid = document.getElementById("adminPageGrid");
+    grid.style.setProperty("--page-columns", deck.structure.columns);
+    grid.innerHTML = orderedPages().map((item) => `
+        <button class="page-map-button ${item.id === page.id ? "active" : ""}" type="button" data-admin-page="${escapeAttribute(item.id)}">
+            <strong>${escapeHtml(item.label)}</strong>
+            <small>${escapeHtml(shorten(item.title, 26))}</small>
         </button>
     `).join("");
 }
 
-function renderCmsOptions() {
+function renderMiniPreview(target, page) {
+    target.classList.toggle("aspect-9-16", page.aspect === "9:16");
+    target.style.backgroundImage = page.background ? `url("${page.background.replaceAll('"', '\\"')}")` : "";
+    target.innerHTML = `
+        <div class="mini-copy">
+            <strong>${escapeHtml(page.title || "無題")}</strong>
+            ${page.memo ? `<span>${escapeHtml(page.memo)}</span>` : ""}
+        </div>
+    `;
+}
+
+function renderEditorPageOptions() {
     const select = document.getElementById("cmsPageSelect");
-    if (!select) return;
-    renderBackgroundOptions();
     const previous = select.value || activePageId;
-    select.innerHTML = deck.pages.map((page) => `<option value="${escapeAttribute(page.id)}">${escapeHtml(page.label)} ${escapeHtml(page.title)}</option>`).join("");
-    select.value = deck.pages.some((page) => page.id === previous) ? previous : deck.pages[0].id;
-    fillCmsForm(select.value);
+    select.innerHTML = orderedPages().map((page) => `
+        <option value="${escapeAttribute(page.id)}">${escapeHtml(page.label)}　${escapeHtml(shorten(page.title, 34))}</option>
+    `).join("");
+    select.value = deck.pages.some((page) => page.id === previous) ? previous : activePageId;
+    document.getElementById("verticalRowsInput").value = deck.structure.rows;
+    document.getElementById("horizontalColumnsInput").value = deck.structure.columns;
 }
 
-function renderBackgroundOptions() {
-    const select = document.getElementById("cmsBackgroundSelect");
-    if (!select || select.options.length) return;
-    select.innerHTML = backgroundOptions.map((option) => `<option value="${escapeAttribute(option.value)}">${escapeHtml(option.label)}</option>`).join("");
-}
-
-function fillCmsForm(pageId) {
-    const page = deck.pages.find((item) => item.id === pageId);
+function fillEditorForm(pageId) {
+    const page = deck.pages.find((item) => item.id === pageId) || activePage();
     if (!page) return;
-    document.getElementById("cmsGroupInput").value = page.group || "";
-    document.getElementById("cmsLabelInput").value = page.label || "";
+    document.getElementById("cmsPageSelect").value = page.id;
+    document.getElementById("cmsGroupInput").value = page.group;
+    document.getElementById("cmsColumnInput").value = page.column;
+    document.getElementById("cmsAspectInput").value = page.aspect || "5:7";
     const backgroundSelect = document.getElementById("cmsBackgroundSelect");
-    if (backgroundSelect) {
-        const hasOption = backgroundOptions.some((option) => option.value === (page.background || ""));
-        backgroundSelect.value = hasOption ? (page.background || "") : "";
-    }
+    backgroundSelect.value = backgroundOptions.some((option) => option.value === page.background) ? page.background : "";
     document.getElementById("cmsBackgroundInput").value = page.background || "";
     document.getElementById("cmsTitleInput").value = page.title || "";
     document.getElementById("cmsTitleSizeInput").value = page.titleSize || DEFAULT_TEXT_SIZES.title;
-    document.getElementById("cmsBodySizeInput").value = page.bodySize || DEFAULT_TEXT_SIZES.body;
     document.getElementById("cmsBodyInput").value = page.body || "";
+    document.getElementById("cmsBodySizeInput").value = page.bodySize || DEFAULT_TEXT_SIZES.body;
     document.getElementById("cmsBandInput").value = page.band || "";
     document.getElementById("cmsBandSizeInput").value = page.bandSize || DEFAULT_TEXT_SIZES.band;
     document.getElementById("cmsMemoInput").value = page.memo || "";
     document.getElementById("cmsMemoSizeInput").value = page.memoSize || DEFAULT_TEXT_SIZES.memo;
-    document.getElementById("cmsCtaEnabledInput").checked = page.ctaEnabled !== false;
+    document.getElementById("cmsCtaEnabledInput").checked = Boolean(page.ctaEnabled);
     document.getElementById("cmsCtaLabelInput").value = page.ctaLabel || "";
     document.getElementById("cmsCtaUrlInput").value = page.ctaUrl || "";
+    renderMiniPreview(document.getElementById("editorPreview"), page);
 }
 
-function setMode(nextMode) {
-    mode = nextMode;
-    document.querySelectorAll(".mode-tab").forEach((tab) => {
-        tab.classList.toggle("active", tab.dataset.mode === mode);
+async function loadBackgroundCatalog() {
+    try {
+        const response = await fetch("assets/backgrounds/catalog.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("catalog unavailable");
+        const catalog = await response.json();
+        backgroundOptions = [
+            { label: "背景なし", value: "" },
+            ...catalog.filter((item) => item?.label && item?.src).map((item) => ({ label: item.label, value: item.src }))
+        ];
+    } catch {
+        backgroundOptions = [{ label: "背景なし", value: "" }];
+    }
+    const select = document.getElementById("cmsBackgroundSelect");
+    select.innerHTML = backgroundOptions.map((option) => `
+        <option value="${escapeAttribute(option.value)}">${escapeHtml(option.label)}</option>
+    `).join("");
+    fillEditorForm(activePageId);
+}
+
+function setView(nextView) {
+    currentView = views[nextView] ? nextView : "preview";
+    Object.entries(views).forEach(([name, element]) => {
+        element.hidden = name !== currentView;
     });
-    livePanel.hidden = mode !== "live";
-    cmsPanel.hidden = mode !== "cms";
+    document.querySelectorAll(".mode-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === currentView);
+    });
+    if (currentView === "admin") renderAdmin();
+    if (currentView === "editor") fillEditorForm(activePageId);
 }
 
-function setActivePage(pageId, shouldSync = false) {
+function setActivePage(pageId, options = {}) {
     const page = deck.pages.find((item) => item.id === pageId);
     if (!page) return;
     activePageId = page.id;
+    groupSelections[page.group] = page.id;
     renderDeck();
-    requestAnimationFrame(() => {
-        const row = deckViewport.querySelector(`[data-group="${CSS.escape(page.group)}"]`);
-        if (row) row.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    if (shouldSync) {
+    renderAdmin();
+    renderEditorPageOptions();
+    fillEditorForm(page.id);
+    if (options.scroll !== false) {
+        requestAnimationFrame(() => {
+            const row = deckViewport.querySelector(`[data-row="${CSS.escape(page.group)}"]`);
+            row?.scrollIntoView({ behavior: options.instant ? "auto" : "smooth", block: "start" });
+        });
+    }
+    if (options.sync) {
         saveLiveState({ currentPageId: page.id, presentationMode: true });
     }
 }
 
-function moveBy(delta) {
-    const currentIndex = deck.pages.findIndex((page) => page.id === activePageId);
-    const nextPage = deck.pages[Math.min(Math.max(currentIndex + delta, 0), deck.pages.length - 1)];
-    if (nextPage) setActivePage(nextPage.id, true);
+function moveVertical(row, delta, sync = liveState.presentationMode) {
+    const nextRow = clampNumber(Number(row) + Number(delta), 1, deck.structure.rows);
+    const target = pageAt(nextRow, 1);
+    if (target) setActivePage(target.id, { sync });
 }
 
-function updateLiveStatus() {
-    liveStatusLabel.textContent = liveState.presentationMode ? "Live中" : "自由閲覧";
-    liveStatusLabel.classList.toggle("live", liveState.presentationMode);
+function moveHorizontal(pageId, sync = liveState.presentationMode) {
+    if (pageId) setActivePage(pageId, { scroll: false, sync });
+}
+
+function resizeDeck(rows, columns) {
+    const nextRows = clampNumber(rows, 1, MAX_ROWS);
+    const nextColumns = clampNumber(columns, 1, MAX_COLUMNS);
+    const shrinking = nextRows < deck.structure.rows || nextColumns < deck.structure.columns;
+    if (shrinking && !window.confirm("範囲外のページが削除されます。ページ構成を変更しますか？")) {
+        renderEditorPageOptions();
+        return;
+    }
+
+    const nextPages = [];
+    for (let row = 1; row <= nextRows; row += 1) {
+        for (let column = 1; column <= nextColumns; column += 1) {
+            const existing = pageAt(row, column);
+            const page = existing || createPage(row, column);
+            page.group = String(row);
+            page.column = column;
+            page.label = column === 1 ? String(row) : `${row}-${column}`;
+            nextPages.push(page);
+        }
+    }
+    deck.pages = nextPages;
+    deck.structure = { rows: nextRows, columns: nextColumns };
+    if (!deck.pages.some((page) => page.id === activePageId)) activePageId = deck.pages[0].id;
+    groupSelections = {};
+    saveDeck();
+    renderAll();
+    setActivePage(activePageId, { instant: true, scroll: false, sync: liveState.presentationMode });
+}
+
+function saveCurrentPage() {
+    const pageId = document.getElementById("cmsPageSelect").value;
+    const page = deck.pages.find((item) => item.id === pageId);
+    if (!page) return;
+    page.aspect = document.getElementById("cmsAspectInput").value;
+    page.background = document.getElementById("cmsBackgroundInput").value.trim();
+    page.title = document.getElementById("cmsTitleInput").value.trim();
+    page.titleSize = Number(document.getElementById("cmsTitleSizeInput").value || DEFAULT_TEXT_SIZES.title);
+    page.body = document.getElementById("cmsBodyInput").value.trim();
+    page.bodySize = Number(document.getElementById("cmsBodySizeInput").value || DEFAULT_TEXT_SIZES.body);
+    page.band = document.getElementById("cmsBandInput").value.trim();
+    page.bandSize = Number(document.getElementById("cmsBandSizeInput").value || DEFAULT_TEXT_SIZES.band);
+    page.memo = document.getElementById("cmsMemoInput").value.trim();
+    page.memoSize = Number(document.getElementById("cmsMemoSizeInput").value || DEFAULT_TEXT_SIZES.memo);
+    page.ctaEnabled = document.getElementById("cmsCtaEnabledInput").checked;
+    page.ctaLabel = document.getElementById("cmsCtaLabelInput").value.trim();
+    page.ctaUrl = document.getElementById("cmsCtaUrlInput").value.trim();
+    saveDeck();
+    setActivePage(page.id, { scroll: false, sync: liveState.presentationMode });
+}
+
+function renderLiveStatus() {
+    const isLive = Boolean(liveState.presentationMode);
+    const front = document.getElementById("liveStatusLabel");
+    const admin = document.getElementById("adminLiveStatus");
+    front.textContent = isLive ? "Live中" : "自由閲覧";
+    admin.textContent = isLive ? "Live中" : "待機中";
+    front.classList.toggle("live", isLive);
+    admin.classList.toggle("live", isLive);
+}
+
+function showQrDialog() {
+    const viewerUrl = `${location.origin}${location.pathname}?view=preview`;
+    document.getElementById("viewerUrlText").textContent = viewerUrl;
+    const target = document.getElementById("qrCode");
+    target.innerHTML = "";
+    if (typeof qrcode === "function") {
+        const qr = qrcode(0, "M");
+        qr.addData(viewerUrl);
+        qr.make();
+        target.innerHTML = qr.createImgTag(7, 8, "SwipeCard閲覧URL");
+    } else {
+        target.textContent = "QRコードライブラリを読み込めませんでした。URLをご利用ください。";
+    }
+    qrDialog.showModal();
+}
+
+function updateActiveFromScroll() {
+    if (!deckViewport.children.length) return;
+    const viewportTop = deckViewport.getBoundingClientRect().top;
+    const rows = [...deckViewport.querySelectorAll(".deck-row")];
+    const closest = rows.reduce((best, row) => {
+        const distance = Math.abs(row.getBoundingClientRect().top - viewportTop);
+        return !best || distance < best.distance ? { row, distance } : best;
+    }, null);
+    const pageId = closest?.row.dataset.pageId;
+    if (pageId && pageId !== activePageId) {
+        activePageId = pageId;
+        renderAdmin();
+        fillEditorForm(pageId);
+        if (liveState.presentationMode) saveLiveState({ currentPageId: pageId });
+    }
+}
+
+function previewFontSize(size) {
+    return Math.max(12, Math.round(Number(size || 12) * PREVIEW_FONT_SCALE));
+}
+
+function clampNumber(value, min, max) {
+    return Math.min(Math.max(Number(value) || min, min), max);
+}
+
+function shorten(value, maxLength) {
+    const text = String(value || "").replaceAll("\n", " ");
+    return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
 }
 
 function escapeHtml(value) {
-    return String(value)
+    return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -355,26 +524,24 @@ function escapeAttribute(value) {
     return escapeHtml(value).replaceAll("`", "&#096;");
 }
 
-function previewFontSize(size) {
-    return Math.max(12, Math.round(Number(size) * PREVIEW_FONT_SCALE));
-}
-
 document.addEventListener("click", (event) => {
-    const jumpButton = event.target.closest("[data-jump-page]");
-    if (jumpButton && jumpButton.dataset.jumpPage) {
-        setActivePage(jumpButton.dataset.jumpPage, liveState.presentationMode);
-    }
+    const viewButton = event.target.closest("[data-view]");
+    if (viewButton) setView(viewButton.dataset.view);
 
-    const liveButton = event.target.closest("[data-live-page]");
-    if (liveButton) {
-        setActivePage(liveButton.dataset.livePage, true);
-    }
+    const rowButton = event.target.closest("[data-row-move]");
+    if (rowButton) moveVertical(rowButton.dataset.row, rowButton.dataset.rowMove);
 
-    const modeButton = event.target.closest(".mode-tab");
-    if (modeButton) {
-        setMode(modeButton.dataset.mode);
-    }
+    const horizontalButton = event.target.closest("[data-horizontal-page]");
+    if (horizontalButton?.dataset.horizontalPage) moveHorizontal(horizontalButton.dataset.horizontalPage);
+
+    const adminPageButton = event.target.closest("[data-admin-page]");
+    if (adminPageButton) setActivePage(adminPageButton.dataset.adminPage, { sync: liveState.presentationMode });
 });
+
+deckViewport.addEventListener("scroll", () => {
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(updateActiveFromScroll, 90);
+}, { passive: true });
 
 document.getElementById("startLiveButton").addEventListener("click", () => {
     saveLiveState({ presentationMode: true, currentPageId: activePageId });
@@ -384,116 +551,49 @@ document.getElementById("endLiveButton").addEventListener("click", () => {
     saveLiveState({ presentationMode: false });
 });
 
-document.getElementById("prevPageButton").addEventListener("click", () => moveBy(-1));
-document.getElementById("nextPageButton").addEventListener("click", () => moveBy(1));
-document.getElementById("firstPageButton").addEventListener("click", () => setActivePage(deck.pages[0].id, true));
+document.getElementById("openEditorButton").addEventListener("click", () => setView("editor"));
+document.getElementById("backToAdminButton").addEventListener("click", () => setView("admin"));
+document.getElementById("showQrButton").addEventListener("click", showQrDialog);
+document.getElementById("closeQrButton").addEventListener("click", () => qrDialog.close());
 
 document.getElementById("cmsPageSelect").addEventListener("change", (event) => {
-    fillCmsForm(event.target.value);
-    setActivePage(event.target.value, false);
+    setActivePage(event.target.value, { scroll: false, sync: false });
 });
 
 document.getElementById("cmsBackgroundSelect").addEventListener("change", (event) => {
     document.getElementById("cmsBackgroundInput").value = event.target.value;
 });
 
-document.getElementById("saveCmsButton").addEventListener("click", () => {
-    const pageId = document.getElementById("cmsPageSelect").value;
-    const page = deck.pages.find((item) => item.id === pageId);
-    if (!page) return;
-    page.group = document.getElementById("cmsGroupInput").value.trim() || page.group;
-    page.label = document.getElementById("cmsLabelInput").value.trim() || page.label;
-    page.background = document.getElementById("cmsBackgroundInput").value.trim();
-    page.title = document.getElementById("cmsTitleInput").value.trim();
-    page.titleSize = Number(document.getElementById("cmsTitleSizeInput").value || DEFAULT_TEXT_SIZES.title);
-    page.bodySize = Number(document.getElementById("cmsBodySizeInput").value || DEFAULT_TEXT_SIZES.body);
-    page.body = document.getElementById("cmsBodyInput").value.trim();
-    page.band = document.getElementById("cmsBandInput").value.trim();
-    page.bandSize = Number(document.getElementById("cmsBandSizeInput").value || DEFAULT_TEXT_SIZES.band);
-    page.memo = document.getElementById("cmsMemoInput").value.trim();
-    page.memoSize = Number(document.getElementById("cmsMemoSizeInput").value || DEFAULT_TEXT_SIZES.memo);
-    page.ctaEnabled = document.getElementById("cmsCtaEnabledInput").checked;
-    page.ctaLabel = document.getElementById("cmsCtaLabelInput").value.trim();
-    page.ctaUrl = document.getElementById("cmsCtaUrlInput").value.trim();
-    saveDeck();
-    setActivePage(page.id, liveState.presentationMode);
+document.getElementById("applyStructureButton").addEventListener("click", () => {
+    resizeDeck(
+        document.getElementById("verticalRowsInput").value,
+        document.getElementById("horizontalColumnsInput").value
+    );
 });
 
-document.getElementById("addPageButton").addEventListener("click", () => {
-    const currentPage = deck.pages.find((item) => item.id === document.getElementById("cmsPageSelect").value) || deck.pages.at(-1);
-    const nextNumber = deck.pages.length + 1;
-    const newPage = {
-        id: `page-${Date.now()}`,
-        group: currentPage ? String(Number(currentPage.group || nextNumber) + 1) : String(nextNumber),
-        label: String(nextNumber),
-        title: "新しいページ",
-        body: "ここに本文を入力します。",
-        band: "",
-        memo: "",
-        titleSize: DEFAULT_TEXT_SIZES.title,
-        bodySize: DEFAULT_TEXT_SIZES.body,
-        bandSize: DEFAULT_TEXT_SIZES.band,
-        memoSize: DEFAULT_TEXT_SIZES.memo,
-        ctaEnabled: false,
-        ctaLabel: "",
-        ctaUrl: "",
-        background: "",
-        align: "top"
-    };
-    deck.pages.push(newPage);
-    saveDeck();
-    renderDeck();
-    document.getElementById("cmsPageSelect").value = newPage.id;
-    fillCmsForm(newPage.id);
-    setActivePage(newPage.id, liveState.presentationMode);
-});
-
-document.getElementById("duplicatePageButton").addEventListener("click", () => {
-    const source = deck.pages.find((item) => item.id === document.getElementById("cmsPageSelect").value);
-    if (!source) return;
-    const copy = {
-        ...structuredClone(source),
-        id: `page-${Date.now()}`,
-        label: `${source.label}-copy`,
-        title: source.title ? `${source.title} コピー` : ""
-    };
-    const sourceIndex = deck.pages.findIndex((item) => item.id === source.id);
-    deck.pages.splice(sourceIndex + 1, 0, copy);
-    saveDeck();
-    renderDeck();
-    document.getElementById("cmsPageSelect").value = copy.id;
-    fillCmsForm(copy.id);
-    setActivePage(copy.id, liveState.presentationMode);
-});
-
-document.getElementById("deletePageButton").addEventListener("click", () => {
-    if (deck.pages.length <= 1) return;
-    const pageId = document.getElementById("cmsPageSelect").value;
-    const index = deck.pages.findIndex((item) => item.id === pageId);
-    if (index < 0) return;
-    deck.pages.splice(index, 1);
-    const nextPage = deck.pages[Math.max(0, index - 1)];
-    saveDeck();
-    renderDeck();
-    setActivePage(nextPage.id, liveState.presentationMode);
-});
+document.getElementById("saveCmsButton").addEventListener("click", saveCurrentPage);
 
 document.getElementById("resetDemoButton").addEventListener("click", () => {
+    if (!window.confirm("編集内容を消して初期デモに戻しますか？")) return;
     deck = structuredClone(demoDeck);
+    activePageId = deck.pages[0].id;
+    groupSelections = {};
     saveDeck();
-    setActivePage(deck.pages[0].id, false);
+    renderAll();
 });
 
 if (channel) {
     channel.addEventListener("message", (event) => {
         if (event.data.type === "live-updated") {
             liveState = event.data.state;
-            if (liveState.presentationMode) setActivePage(liveState.currentPageId, false);
-            updateLiveStatus();
+            if (liveState.presentationMode) {
+                setActivePage(liveState.currentPageId, { sync: false });
+            }
+            renderLiveStatus();
         }
         if (event.data.type === "deck-updated") {
             deck = loadDeck();
-            renderDeck();
+            renderAll();
         }
     });
 }
@@ -501,21 +601,21 @@ if (channel) {
 window.addEventListener("storage", (event) => {
     if (event.key === LIVE_KEY) {
         liveState = loadLiveState();
-        if (liveState.presentationMode) setActivePage(liveState.currentPageId, false);
-        updateLiveStatus();
+        if (liveState.presentationMode) setActivePage(liveState.currentPageId, { sync: false });
+        renderLiveStatus();
     }
     if (event.key === STORAGE_KEY) {
         deck = loadDeck();
-        renderDeck();
+        renderAll();
     }
 });
 
-viewerUrlText.textContent = `${location.origin}${location.pathname}?mode=preview`;
-setMode(mode);
-renderDeck();
+setView(currentView);
+renderAll();
+loadBackgroundCatalog();
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {
-        // ローカルファイルで開いた場合などは登録できないため、静かに無視する。
+        // ローカルファイルで開いた場合などは登録できないため静かに無視する。
     });
 }

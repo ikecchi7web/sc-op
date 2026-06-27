@@ -1,152 +1,233 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d2744">
-    <title>SwipeCard Live | MVP</title>
-    <meta name="description" content="SwipeCard Liveの閲覧・Live操作・簡易CMSを1画面で試すMVPです。">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#1d1660">
+    <title>SwipeCard Live</title>
+    <meta name="description" content="対面プレゼン用SwipeCardの閲覧・Live操作・簡易CMSです。">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
     <div class="app-shell">
-        <header class="topbar">
-            <div>
-                <p class="eyebrow">SwipeCard Live MVP</p>
-                <h1>対面プレゼン用Web名刺</h1>
-            </div>
-            <nav class="mode-tabs" aria-label="表示モード">
-                <button class="mode-tab active" data-mode="preview">閲覧</button>
-                <button class="mode-tab" data-mode="live">Live操作</button>
-                <button class="mode-tab" data-mode="cms">CMS編集</button>
+        <header class="app-header">
+            <a class="brand" href="./" aria-label="SwipeCard Live ホーム">
+                <span class="brand-mark">S</span>
+                <span>
+                    <strong>SwipeCard</strong>
+                    <small>Live presentation</small>
+                </span>
+            </a>
+            <nav class="mode-tabs" aria-label="画面切り替え">
+                <button class="mode-tab active" type="button" data-view="preview">フロント</button>
+                <button class="mode-tab" type="button" data-view="admin">管理</button>
+                <button class="mode-tab" type="button" data-view="editor">ページ編集</button>
             </nav>
         </header>
 
-        <section class="notice">
-            <span>方針</span>
-            縦方向は上下スワイプ。横展開は横スワイプを使わず、大きなタップボタンで移動します。
-        </section>
-
-        <main class="workspace">
-            <section class="phone-frame" aria-label="相手が見るSwipeCard画面">
-                <div class="phone-toolbar">
-                    <span id="deckTitleLabel">SwipeCard Demo</span>
+        <main>
+            <section id="previewView" class="app-view">
+                <div class="view-heading">
+                    <div>
+                        <p class="eyebrow">FRONT</p>
+                        <h1 id="deckTitleLabel">SwipeCard Demo</h1>
+                    </div>
                     <span id="liveStatusLabel" class="status-pill">自由閲覧</span>
                 </div>
-                <div id="deckViewport" class="deck-viewport" tabindex="0"></div>
+                <div class="front-stage">
+                    <div id="deckViewport" class="deck-viewport" tabindex="0" aria-label="SwipeCardページ"></div>
+                </div>
             </section>
 
-            <aside class="side-panel" id="livePanel" hidden>
-                <div class="panel-card">
-                    <h2>Live操作</h2>
-                    <p class="panel-help">対面プレゼン中に、相手画面を指定ページへ追従させる想定です。MVPでは同じブラウザ内の別タブ同期で確認します。</p>
-                    <div class="control-grid">
-                        <button class="primary-action" id="startLiveButton">Live開始</button>
-                        <button id="endLiveButton">Live終了</button>
-                        <button id="prevPageButton">前へ</button>
-                        <button id="nextPageButton">次へ</button>
-                        <button id="firstPageButton">最初へ</button>
+            <section id="adminView" class="app-view" hidden>
+                <div class="view-heading">
+                    <div>
+                        <p class="eyebrow">PRESENTER</p>
+                        <h1>管理画面</h1>
                     </div>
+                    <span id="adminLiveStatus" class="status-pill">待機中</span>
                 </div>
-                <div class="panel-card">
-                    <h3>ページ指定</h3>
-                    <div id="pageControlList" class="page-control-list"></div>
-                </div>
-                <div class="panel-card">
-                    <h3>共有URL</h3>
-                    <p class="panel-help">本番ではQRコード化します。今は別タブで開いて同期確認します。</p>
-                    <code id="viewerUrlText"></code>
-                </div>
-            </aside>
 
-            <aside class="side-panel" id="cmsPanel" hidden>
-                <div class="panel-card">
-                    <h2>簡易CMS</h2>
-                    <p class="panel-help">まずは完成WebP背景＋テキスト重ねを想定した編集です。画像生成や切り出しは外部ツールで行います。</p>
-                    <label>
-                        編集ページ
-                        <select id="cmsPageSelect"></select>
-                    </label>
-                    <div class="inline-fields">
-                        <label>
-                            縦段 group
-                            <input id="cmsGroupInput" type="text" placeholder="例: 2">
-                        </label>
-                        <label>
-                            表示ラベル
-                            <input id="cmsLabelInput" type="text" placeholder="例: 2-1">
-                        </label>
-                    </div>
-                    <label>
-                        背景画像を選択
-                        <select id="cmsBackgroundSelect"></select>
-                    </label>
-                    <label>
-                        背景画像URL（直接指定）
-                        <input id="cmsBackgroundInput" type="text" placeholder="../shared/.../page.webp">
-                    </label>
-                    <label>
-                        title
-                        <input id="cmsTitleInput" type="text">
-                    </label>
-                    <div class="inline-fields">
-                        <label>
-                            タイトルサイズ px
-                            <input id="cmsTitleSizeInput" type="number" min="18" max="160" step="1">
-                        </label>
-                        <label>
-                            本文サイズ px
-                            <input id="cmsBodySizeInput" type="number" min="12" max="120" step="1">
-                        </label>
-                    </div>
-                    <label>
-                        body
-                        <textarea id="cmsBodyInput" rows="5"></textarea>
-                    </label>
-                    <label>
-                        band
-                        <textarea id="cmsBandInput" rows="3"></textarea>
-                    </label>
-                    <div class="inline-fields">
-                        <label>
-                            bandサイズ px
-                            <input id="cmsBandSizeInput" type="number" min="12" max="120" step="1">
-                        </label>
-                        <label>
-                            memoサイズ px
-                            <input id="cmsMemoSizeInput" type="number" min="12" max="120" step="1">
-                        </label>
-                    </div>
-                    <label>
-                        memo
-                        <textarea id="cmsMemoInput" rows="3"></textarea>
-                    </label>
-                    <label class="check-field">
-                        <input id="cmsCtaEnabledInput" type="checkbox">
-                        CTAを表示する
-                    </label>
-                    <label>
-                        CTAラベル
-                        <input id="cmsCtaLabelInput" type="text">
-                    </label>
-                    <label>
-                        CTA URL
-                        <input id="cmsCtaUrlInput" type="url">
-                    </label>
-                    <button class="primary-action" id="saveCmsButton">このページを保存</button>
-                    <button id="addPageButton">新しいページを追加</button>
-                    <button id="duplicatePageButton">このページを複製</button>
-                    <button class="danger-action" id="deletePageButton">このページを削除</button>
-                    <button id="resetDemoButton">デモ内容に戻す</button>
+                <div class="admin-layout">
+                    <section class="surface admin-summary">
+                        <div class="section-title-row">
+                            <div>
+                                <p class="section-kicker">現在のページ</p>
+                                <h2 id="adminPageTitle">ページタイトル</h2>
+                            </div>
+                            <span id="adminPageLabel" class="page-badge">1</span>
+                        </div>
+                        <div id="adminPreview" class="admin-preview" aria-label="現在ページのサムネイル"></div>
+                        <div class="live-actions">
+                            <button id="startLiveButton" class="primary-action" type="button">Live開始</button>
+                            <button id="endLiveButton" type="button">Live終了</button>
+                        </div>
+                    </section>
+
+                    <section class="surface page-map-card">
+                        <div class="section-title-row">
+                            <div>
+                                <p class="section-kicker">DECK MAP</p>
+                                <h2>ページ構成</h2>
+                            </div>
+                            <span id="structureSummary" class="structure-summary">縦4 × 横2</span>
+                        </div>
+                        <p class="panel-help">縦がストーリーの本線、横が各ページの補足です。ページをタップすると表示を切り替えます。</p>
+                        <div id="adminPageGrid" class="admin-page-grid"></div>
+                    </section>
+
+                    <section class="admin-footer-actions">
+                        <button id="openEditorButton" class="primary-action large-action" type="button">ページ編集</button>
+                        <button id="showQrButton" class="dark-action large-action" type="button">QRコード表示</button>
+                    </section>
                 </div>
-            </aside>
+            </section>
+
+            <section id="editorView" class="app-view" hidden>
+                <div class="view-heading">
+                    <div>
+                        <p class="eyebrow">EDITOR</p>
+                        <h1>ページ編集</h1>
+                    </div>
+                    <button id="backToAdminButton" class="quiet-action" type="button">管理画面へ</button>
+                </div>
+
+                <div class="editor-layout">
+                    <aside class="editor-sidebar">
+                        <section class="surface structure-card">
+                            <p class="section-kicker">DECK STRUCTURE</p>
+                            <h2>ページ構成</h2>
+                            <div class="structure-inputs">
+                                <label>
+                                    <span>縦</span>
+                                    <input id="verticalRowsInput" type="number" min="1" max="12" inputmode="numeric">
+                                    <span>行</span>
+                                </label>
+                                <label>
+                                    <span>横</span>
+                                    <input id="horizontalColumnsInput" type="number" min="1" max="6" inputmode="numeric">
+                                    <span>列</span>
+                                </label>
+                            </div>
+                            <button id="applyStructureButton" class="dark-action" type="button">構成を反映</button>
+                            <p class="field-note">数を減らすと範囲外のページは削除されます。</p>
+                        </section>
+
+                        <section class="surface editor-preview-card">
+                            <p class="section-kicker">PREVIEW</p>
+                            <div id="editorPreview" class="editor-preview"></div>
+                        </section>
+                    </aside>
+
+                    <section class="surface cms-card">
+                        <div class="section-title-row">
+                            <div>
+                                <p class="section-kicker">LITE CMS</p>
+                                <h2>ページ内容</h2>
+                            </div>
+                            <button id="resetDemoButton" class="quiet-action compact-action" type="button">初期状態へ</button>
+                        </div>
+
+                        <label>
+                            編集ページ
+                            <select id="cmsPageSelect"></select>
+                        </label>
+
+                        <div class="inline-fields">
+                            <label>
+                                縦位置
+                                <input id="cmsGroupInput" type="number" min="1" readonly>
+                            </label>
+                            <label>
+                                横位置
+                                <input id="cmsColumnInput" type="number" min="1" readonly>
+                            </label>
+                        </div>
+
+                        <label>
+                            ページ比率
+                            <select id="cmsAspectInput">
+                                <option value="5:7">基本 5:7</option>
+                                <option value="9:16">縦動画 9:16</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            登録済み背景画像
+                            <select id="cmsBackgroundSelect"></select>
+                        </label>
+                        <label>
+                            背景画像URL
+                            <input id="cmsBackgroundInput" type="text" placeholder="assets/backgrounds/page-01.webp">
+                        </label>
+
+                        <div class="text-field-block">
+                            <div class="field-heading">
+                                <label for="cmsTitleInput">title</label>
+                                <label class="size-field">文字 <input id="cmsTitleSizeInput" type="number" min="18" max="180"> px</label>
+                            </div>
+                            <textarea id="cmsTitleInput" rows="2" placeholder="タイトル"></textarea>
+                        </div>
+
+                        <div class="text-field-block">
+                            <div class="field-heading">
+                                <label for="cmsBodyInput">body（本文）</label>
+                                <label class="size-field">文字 <input id="cmsBodySizeInput" type="number" min="12" max="120"> px</label>
+                            </div>
+                            <textarea id="cmsBodyInput" rows="5" placeholder="本文"></textarea>
+                        </div>
+
+                        <div class="text-field-block">
+                            <div class="field-heading">
+                                <label for="cmsBandInput">band</label>
+                                <label class="size-field">文字 <input id="cmsBandSizeInput" type="number" min="12" max="120"> px</label>
+                            </div>
+                            <textarea id="cmsBandInput" rows="3" placeholder="強調文"></textarea>
+                        </div>
+
+                        <div class="text-field-block">
+                            <div class="field-heading">
+                                <label for="cmsMemoInput">memo</label>
+                                <label class="size-field">文字 <input id="cmsMemoSizeInput" type="number" min="12" max="120"> px</label>
+                            </div>
+                            <textarea id="cmsMemoInput" rows="3" placeholder="ページ下部のメモ"></textarea>
+                        </div>
+
+                        <fieldset class="cta-fieldset">
+                            <legend>CTA（テキスト4枠とは別設定）</legend>
+                            <label class="check-field">
+                                <input id="cmsCtaEnabledInput" type="checkbox">
+                                CTAを表示する
+                            </label>
+                            <div class="inline-fields">
+                                <label>
+                                    CTAラベル
+                                    <input id="cmsCtaLabelInput" type="text">
+                                </label>
+                                <label>
+                                    CTA URL
+                                    <input id="cmsCtaUrlInput" type="url">
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <button id="saveCmsButton" class="primary-action save-action" type="button">このページを保存</button>
+                    </section>
+                </div>
+            </section>
         </main>
     </div>
 
+    <dialog id="qrDialog" class="qr-dialog">
+        <button id="closeQrButton" class="dialog-close" type="button" aria-label="閉じる">×</button>
+        <p class="section-kicker">SHARE</p>
+        <h2>閲覧用QRコード</h2>
+        <div id="qrCode" class="qr-code" aria-label="閲覧URLのQRコード"></div>
+        <code id="viewerUrlText"></code>
+    </dialog>
+
+    <script src="vendor/qrcode-generator/qrcode.js"></script>
     <script src="main.js"></script>
 </body>
-
 </html>
