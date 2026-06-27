@@ -1,6 +1,6 @@
-const STORAGE_KEY = "swipecard-live-demo-deck-v5";
-const LIVE_KEY = "swipecard-live-demo-state-v5";
-const CHANNEL_NAME = "swipecard-live-v5";
+const STORAGE_KEY = "swipecard-live-demo-deck-v6";
+const LIVE_KEY = "swipecard-live-demo-state-v6";
+const CHANNEL_NAME = "swipecard-live-v6";
 const channel = "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
 
 const DEFAULT_TEXT_SIZES = {
@@ -16,19 +16,31 @@ const MAX_COLUMNS = 6;
 
 const demoCopy = [
     {
-        title: "0→1営業支援ツール",
-        body: "名刺交換を営業の入口に変える\nスキルの見える化\n信用の見える化",
-        band: "学びと評価を\n自分の意思で営業資産に変える",
-        memo: "紙名刺や普通のプロフィールでは伝わらない\n実力と信頼を、その場で見せるための仕組みです。",
-        ctaEnabled: true,
-        ctaLabel: "詳しく見る",
-        ctaUrl: "#"
+        template: "hero-media",
+        title: "Web名刺の池戸",
+        body: "",
+        band: "",
+        memo: "",
+        logo: "assets/media/logo_swipecard.png",
+        heroImage: "assets/media/ikedo_keitai.png"
     },
     {
         title: "SwipeCardとは",
-        body: "対面で説明しながら\n相手のスマホへ資料を届ける\n新しい営業の入口です。",
-        band: "横展開は大きなボタンで移動",
-        memo: "左右スワイプを使わず、迷わない操作を優先します。"
+        body: "単なるWeb名刺ではなく\n対面プレゼンのための営業支援ツール",
+        band: "名刺交換を営業の入口に変える",
+        memo: "相手のスマホへ、説明に合わせて資料を届けます。"
+    },
+    {
+        title: "名刺を超えた\nプレゼンテーション",
+        body: "紙面では伝わらない\n実力・信頼・人柄を\nその場で見せる",
+        band: "30秒で強みを届ける",
+        memo: "QR・NFC・URLからすぐに表示できます。"
+    },
+    {
+        title: "対面で伝えるから\n理解が深まる",
+        body: "見せたい順番に案内しながら\n質問に合わせて補足ページへ",
+        band: "縦はストーリー\n横は補足",
+        memo: "横展開は左右の大きなボタンだけで移動します。"
     },
     {
         title: "学びはあるのに\n見せる形がない",
@@ -37,16 +49,22 @@ const demoCopy = [
         memo: "何を見せれば仕事につながるのか。その空白を埋めます。"
     },
     {
-        title: "紙名刺だけでは伝わらない",
-        body: "実力・信頼・学びの履歴は\n小さな紙面だけでは残りません。",
-        band: "その場で見せる入口が必要です",
-        memo: "補足ページは左右のボタンで行き来します。"
+        title: "スキルを見える化",
+        body: "学んだ内容・制作物・実績を\n相手が理解できる順番に整理",
+        band: "学びを仕事につながる形へ",
+        memo: "背景画像とHTMLテキストを組み合わせて更新できます。"
+    },
+    {
+        title: "信用を見える化",
+        body: "評価・資格・推薦・活動履歴を\n一つの流れで提示",
+        band: "紙名刺に載らない根拠を見せる",
+        memo: "相手が後から自由に見返すこともできます。"
     },
     {
         title: "学びと評価を\n営業資産に変える",
         body: "実績・評価・次の行動を\n1つのURLで見せます。",
         band: "相手のスマホでも軽く表示",
-        memo: "完成WebPとHTMLテキストを組み合わせます。"
+        memo: "対面プレゼン後も営業の入口として残ります。"
     },
     {
         title: "Liveで同じページを見る",
@@ -56,22 +74,24 @@ const demoCopy = [
     },
     {
         title: "その場で次の約束へ",
-        body: "QR・URL共有から\nフォーム・電話・vCard保存へ。",
+        body: "説明の直後に\n相談フォームや連絡先登録へ",
         band: "説明から行動までを短くする",
         memo: "CTAはページごとに表示・非表示を選べます。",
         ctaEnabled: true,
-        ctaLabel: "相談する",
-        ctaUrl: "https://example.com"
+        ctaLabel: "ご相談はこちら",
+        ctaUrl: "https://forms.gle/mQ7J39qe9kn87SxG8"
     },
     {
-        title: "SwipeCard Demo",
-        body: "ここまでが縦4行・横2列の\n基本デモです。",
-        band: "管理画面から構成を変更できます",
-        memo: "縦行・横列を増減するとページ枠を自動調整します。"
+        template: "contact",
+        title: "連絡先・ご相談",
+        body: "",
+        band: "",
+        memo: "",
+        logo: "assets/media/logo_swipecard.png"
     }
 ];
 
-const demoDeck = createDeck(4, 2);
+const demoDeck = createDeck(5, 3, true);
 let deck = loadDeck();
 let liveState = loadLiveState();
 let currentView = new URLSearchParams(location.search).get("view") || "preview";
@@ -88,17 +108,23 @@ const views = {
 const deckViewport = document.getElementById("deckViewport");
 const qrDialog = document.getElementById("qrDialog");
 
-function createDeck(rows, columns) {
+function createDeck(rows, columns, edgeRowsSingle = false) {
     const pages = [];
     for (let row = 1; row <= rows; row += 1) {
-        for (let column = 1; column <= columns; column += 1) {
+        const rowColumns = columnsForRow(row, { rows, columns, edgeRowsSingle });
+        for (let column = 1; column <= rowColumns; column += 1) {
             pages.push(createPage(row, column, demoCopy[pages.length]));
         }
     }
     return {
         id: "demo-deck",
         title: "SwipeCard Demo",
-        structure: { rows, columns },
+        structure: {
+            rows,
+            columns,
+            edgeRowsSingle,
+            columnsByRow: Array.from({ length: rows }, (_, index) => columnsForRow(index + 1, { rows, columns, edgeRowsSingle }))
+        },
         pages
     };
 }
@@ -121,8 +147,23 @@ function createPage(row, column, source = {}) {
         ctaLabel: source.ctaLabel || "",
         ctaUrl: source.ctaUrl || "",
         background: source.background || "",
-        aspect: source.aspect || "5:7"
+        aspect: source.aspect || "5:7",
+        template: source.template || "standard",
+        logo: source.logo || "",
+        heroImage: source.heroImage || ""
     };
+}
+
+function columnsForRow(row, structure = deck?.structure) {
+    const rows = Number(structure?.rows || 1);
+    const columns = Number(structure?.columns || 1);
+    if (structure?.columnsByRow?.[row - 1]) {
+        return Number(structure.columnsByRow[row - 1]);
+    }
+    if (structure?.edgeRowsSingle && (Number(row) === 1 || Number(row) === rows)) {
+        return 1;
+    }
+    return columns;
 }
 
 function normalizeDeck(value) {
@@ -130,7 +171,11 @@ function normalizeDeck(value) {
     result.structure ||= {};
     const rows = clampNumber(result.structure.rows || Math.max(...result.pages.map((page) => Number(page.group) || 1)), 1, MAX_ROWS);
     const columns = clampNumber(result.structure.columns || Math.max(...result.pages.map((page) => Number(page.column) || 1)), 1, MAX_COLUMNS);
-    result.structure = { rows, columns };
+    const edgeRowsSingle = Boolean(result.structure.edgeRowsSingle);
+    const columnsByRow = Array.from({ length: rows }, (_, index) => {
+        return clampNumber(result.structure.columnsByRow?.[index] || columnsForRow(index + 1, { rows, columns, edgeRowsSingle }), 1, columns);
+    });
+    result.structure = { rows, columns, edgeRowsSingle, columnsByRow };
     result.pages.forEach((page, index) => {
         page.group = String(page.group || Math.floor(index / columns) + 1);
         page.column = Number(page.column || (index % columns) + 1);
@@ -140,6 +185,7 @@ function normalizeDeck(value) {
         page.bodySize ||= DEFAULT_TEXT_SIZES.body;
         page.bandSize ||= DEFAULT_TEXT_SIZES.band;
         page.memoSize ||= DEFAULT_TEXT_SIZES.memo;
+        page.template ||= "standard";
     });
     return result;
 }
@@ -243,6 +289,8 @@ function renderDeck() {
 }
 
 function renderPageCard(page) {
+    if (page.template === "hero-media") return renderHeroMediaPage(page);
+    if (page.template === "contact") return renderContactPage(page);
     const backgroundStyle = page.background ? `style="background-image:url('${escapeAttribute(page.background)}')"` : "";
     return `
         <section class="deck-card ${page.background ? "has-bg" : ""} ${page.aspect === "9:16" ? "aspect-9-16" : ""}" ${backgroundStyle}>
@@ -252,6 +300,42 @@ function renderPageCard(page) {
                 ${page.band ? `<div class="deck-band" style="font-size:${previewFontSize(page.bandSize)}px">${escapeHtml(page.band)}</div>` : ""}
                 ${page.ctaEnabled && page.ctaLabel ? `<a class="cta-link" href="${escapeAttribute(page.ctaUrl || "#")}">${escapeHtml(page.ctaLabel)}</a>` : ""}
                 ${page.memo ? `<div class="deck-memo" style="font-size:${previewFontSize(page.memoSize)}px">${escapeHtml(page.memo)}</div>` : ""}
+            </div>
+        </section>
+    `;
+}
+
+function renderHeroMediaPage(page) {
+    return `
+        <section class="deck-card hero-media-page">
+            <div class="hero-media-inner">
+                <img class="special-page-logo" src="${escapeAttribute(page.logo || "assets/media/logo_swipecard.png")}" alt="SwipeCard Web名刺の池戸">
+                <img class="hero-person-image" src="${escapeAttribute(page.heroImage || "assets/media/ikedo_keitai.png")}" alt="スマートフォンに表示された池戸千賀良">
+            </div>
+        </section>
+    `;
+}
+
+function renderContactPage(page) {
+    const formUrl = "https://forms.gle/mQ7J39qe9kn87SxG8";
+    return `
+        <section class="deck-card contact-page">
+            <div class="contact-page-inner">
+                <img class="special-page-logo" src="${escapeAttribute(page.logo || "assets/media/logo_swipecard.png")}" alt="SwipeCard Web名刺の池戸">
+                <h2>名刺を超えた、<br>あなたのプレゼンテーション。</h2>
+                <p>30秒あれば、あなたの強みを届けられる。<br>Swipe型LPで伝わる体験を。</p>
+                <div class="contact-actions">
+                    <a class="contact-primary" href="assets/data/card.vcf">連絡先に登録</a>
+                    <a class="contact-secondary" href="${formUrl}" target="_blank" rel="noopener noreferrer">ご相談はこちら</a>
+                </div>
+                <div class="contact-socials" aria-label="SNS">
+                    ${["X", "I", "L", "F", "Y"].map((name) => `
+                        <span class="contact-social"><img src="assets/media/logo/${name}.png" alt=""></span>
+                    `).join("")}
+                    <button class="contact-social contact-qr-button" type="button" data-open-qr aria-label="QRコード表示">
+                        <img src="assets/media/logo/QR.png" alt="">
+                    </button>
+                </div>
             </div>
         </section>
     `;
@@ -285,22 +369,48 @@ function renderAdmin() {
     const page = activePage();
     document.getElementById("adminPageTitle").textContent = page.title || "無題のページ";
     document.getElementById("adminPageLabel").textContent = page.label;
-    document.getElementById("structureSummary").textContent = `縦${deck.structure.rows} × 横${deck.structure.columns}`;
+    document.getElementById("structureSummary").textContent = `縦${deck.structure.rows} / 横${deck.structure.columnsByRow.join("・")}`;
     renderMiniPreview(document.getElementById("adminPreview"), page);
 
     const grid = document.getElementById("adminPageGrid");
-    grid.style.setProperty("--page-columns", deck.structure.columns);
-    grid.innerHTML = orderedPages().map((item) => `
-        <button class="page-map-button ${item.id === page.id ? "active" : ""}" type="button" data-admin-page="${escapeAttribute(item.id)}">
-            <strong>${escapeHtml(item.label)}</strong>
-            <small>${escapeHtml(shorten(item.title, 26))}</small>
-        </button>
-    `).join("");
+    grid.innerHTML = Array.from({ length: deck.structure.rows }, (_, index) => {
+        const row = index + 1;
+        const rowPages = pagesForRow(row);
+        return `
+            <div class="page-map-row" style="--row-columns:${rowPages.length}" data-map-row="${row}">
+                ${rowPages.map((item) => `
+                    <button class="page-map-button ${item.id === page.id ? "active" : ""}" type="button" data-admin-page="${escapeAttribute(item.id)}">
+                        <strong>${escapeHtml(item.label)}</strong>
+                        <small>${escapeHtml(shorten(item.title, 26))}</small>
+                    </button>
+                `).join("")}
+            </div>
+        `;
+    }).join("");
 }
 
 function renderMiniPreview(target, page) {
     target.classList.toggle("aspect-9-16", page.aspect === "9:16");
     target.style.backgroundImage = page.background ? `url("${page.background.replaceAll('"', '\\"')}")` : "";
+    if (page.template === "hero-media") {
+        target.innerHTML = `
+            <div class="mini-special-page">
+                <img src="${escapeAttribute(page.logo || "assets/media/logo_swipecard.png")}" alt="">
+                <img class="mini-person" src="${escapeAttribute(page.heroImage || "assets/media/ikedo_keitai.png")}" alt="">
+            </div>
+        `;
+        return;
+    }
+    if (page.template === "contact") {
+        target.innerHTML = `
+            <div class="mini-special-page mini-contact">
+                <img src="${escapeAttribute(page.logo || "assets/media/logo_swipecard.png")}" alt="">
+                <strong>名刺を超えた、<br>あなたのプレゼンテーション。</strong>
+                <span>連絡先に登録</span>
+            </div>
+        `;
+        return;
+    }
     target.innerHTML = `
         <div class="mini-copy">
             <strong>${escapeHtml(page.title || "無題")}</strong>
@@ -318,6 +428,7 @@ function renderEditorPageOptions() {
     select.value = deck.pages.some((page) => page.id === previous) ? previous : activePageId;
     document.getElementById("verticalRowsInput").value = deck.structure.rows;
     document.getElementById("horizontalColumnsInput").value = deck.structure.columns;
+    document.getElementById("edgeRowsSingleInput").checked = Boolean(deck.structure.edgeRowsSingle);
 }
 
 function fillEditorForm(pageId) {
@@ -405,10 +516,22 @@ function moveHorizontal(pageId, sync = liveState.presentationMode) {
     if (pageId) setActivePage(pageId, { scroll: false, sync });
 }
 
-function resizeDeck(rows, columns) {
+function resizeDeck(rows, columns, edgeRowsSingle) {
     const nextRows = clampNumber(rows, 1, MAX_ROWS);
     const nextColumns = clampNumber(columns, 1, MAX_COLUMNS);
-    const shrinking = nextRows < deck.structure.rows || nextColumns < deck.structure.columns;
+    const nextStructure = {
+        rows: nextRows,
+        columns: nextColumns,
+        edgeRowsSingle: Boolean(edgeRowsSingle)
+    };
+    nextStructure.columnsByRow = Array.from(
+        { length: nextRows },
+        (_, index) => columnsForRow(index + 1, nextStructure)
+    );
+    const shrinking = deck.pages.some((page) => {
+        const row = Number(page.group);
+        return row > nextRows || Number(page.column) > (nextStructure.columnsByRow[row - 1] || 0);
+    });
     if (shrinking && !window.confirm("範囲外のページが削除されます。ページ構成を変更しますか？")) {
         renderEditorPageOptions();
         return;
@@ -416,7 +539,7 @@ function resizeDeck(rows, columns) {
 
     const nextPages = [];
     for (let row = 1; row <= nextRows; row += 1) {
-        for (let column = 1; column <= nextColumns; column += 1) {
+        for (let column = 1; column <= nextStructure.columnsByRow[row - 1]; column += 1) {
             const existing = pageAt(row, column);
             const page = existing || createPage(row, column);
             page.group = String(row);
@@ -426,7 +549,7 @@ function resizeDeck(rows, columns) {
         }
     }
     deck.pages = nextPages;
-    deck.structure = { rows: nextRows, columns: nextColumns };
+    deck.structure = nextStructure;
     if (!deck.pages.some((page) => page.id === activePageId)) activePageId = deck.pages[0].id;
     groupSelections = {};
     saveDeck();
@@ -536,6 +659,8 @@ document.addEventListener("click", (event) => {
 
     const adminPageButton = event.target.closest("[data-admin-page]");
     if (adminPageButton) setActivePage(adminPageButton.dataset.adminPage, { sync: liveState.presentationMode });
+
+    if (event.target.closest("[data-open-qr]")) showQrDialog();
 });
 
 deckViewport.addEventListener("scroll", () => {
@@ -567,7 +692,8 @@ document.getElementById("cmsBackgroundSelect").addEventListener("change", (event
 document.getElementById("applyStructureButton").addEventListener("click", () => {
     resizeDeck(
         document.getElementById("verticalRowsInput").value,
-        document.getElementById("horizontalColumnsInput").value
+        document.getElementById("horizontalColumnsInput").value,
+        document.getElementById("edgeRowsSingleInput").checked
     );
 });
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "swipecard-live-mvp-v2";
+const CACHE_NAME = "swipecard-live-mvp-v3";
 const APP_SHELL = [
     "./",
     "./index.html",
@@ -6,6 +6,15 @@ const APP_SHELL = [
     "./main.js",
     "./manifest.webmanifest",
     "./assets/backgrounds/catalog.json",
+    "./assets/media/ikedo_keitai.png",
+    "./assets/media/logo_swipecard.png",
+    "./assets/media/logo/X.png",
+    "./assets/media/logo/I.png",
+    "./assets/media/logo/L.png",
+    "./assets/media/logo/F.png",
+    "./assets/media/logo/Y.png",
+    "./assets/media/logo/QR.png",
+    "./assets/data/card.vcf",
     "./vendor/qrcode-generator/qrcode.js"
 ];
 
