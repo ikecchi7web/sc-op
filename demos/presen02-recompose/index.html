@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>presen02 reconstructed layout</title>
+  <style>
+    :root {
+      --bg-lightest: #f8fcff;
+      --bg-blue: #edf7ff;
+      --bg-shadow: #dbeaf6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #eef6fb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .stage {
+      position: relative;
+      width: min(100vw, 1024px);
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 26% 46%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.72) 30%, rgba(255,255,255,0) 58%),
+        radial-gradient(circle at 70% 42%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.42) 34%, rgba(255,255,255,0) 64%),
+        linear-gradient(132deg, #eaf5ff 0%, var(--bg-lightest) 39%, #f6fbff 62%, #eaf4fb 100%);
+      isolation: isolate;
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: -8% -12%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .52;
+      background:
+        radial-gradient(80% 60% at 50% 120%, rgba(216,235,249,.75) 0%, rgba(216,235,249,0) 55%),
+        linear-gradient(115deg, transparent 0 38%, rgba(255,255,255,.75) 39%, transparent 40% 100%);
+    }
+
+    .stage::after {
+      opacity: .38;
+      transform: rotate(-8deg) scale(1.08);
+      background:
+        radial-gradient(100% 70% at 96% 42%, rgba(218,232,244,.68) 0%, rgba(218,232,244,0) 55%),
+        linear-gradient(34deg, transparent 0 52%, rgba(255,255,255,.55) 53%, transparent 54% 100%);
+    }
+
+    .element {
+      position: absolute;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+
+    .left-block {
+      left: 4.5%;
+      top: 25.5%;
+      width: 45.5%;
+      z-index: 2;
+      filter: drop-shadow(0 18px 28px rgba(50, 106, 160, .10));
+    }
+
+    .person-ring {
+      left: 32.5%;
+      top: 49.5%;
+      width: 43.5%;
+      z-index: 4;
+      filter: drop-shadow(0 15px 20px rgba(48, 92, 130, .08));
+    }
+
+    .right-block {
+      right: -4.5%;
+      top: 21.5%;
+      width: 52%;
+      z-index: 1;
+      opacity: .92;
+      filter: drop-shadow(-10px 22px 36px rgba(70, 103, 133, .10));
+    }
+
+    .mist {
+      position: absolute;
+      right: -12%;
+      bottom: 12%;
+      width: 55%;
+      height: 18%;
+      z-index: 3;
+      background: radial-gradient(ellipse at center, rgba(216,232,242,.72) 0%, rgba(216,232,242,.38) 38%, rgba(216,232,242,0) 74%);
+      filter: blur(14px);
+      pointer-events: none;
+    }
+
+    @media (max-width: 700px) {
+      .stage { width: 100vw; }
+      .left-block { left: 2.5%; width: 48%; }
+      .person-ring { left: 31%; width: 45%; }
+      .right-block { right: -10%; width: 58%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" aria-label="左ブロック、人と足元リング、右ブロックを再構成したビジュアル">
+    <img class="element left-block" src="assets/left_block.png" alt="左側の成長ブロック" />
+    <img class="element right-block" src="assets/right_block.png" alt="右側の課題ブロック" />
+    <img class="element person-ring" src="assets/center_person_ring.png" alt="考え込む人物と足元リング" />
+    <div class="mist" aria-hidden="true"></div>
+  </main>
+</body>
+</html>

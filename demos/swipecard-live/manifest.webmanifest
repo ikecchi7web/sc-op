@@ -1,0 +1,9 @@
+{
+  "name": "SwipeCard Live MVP",
+  "short_name": "SwipeCard",
+  "description": "対面プレゼン用Web名刺のMVP",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef4fb",
+  "theme_color": "#0d2744"
+}

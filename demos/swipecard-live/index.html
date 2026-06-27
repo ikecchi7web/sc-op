@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d2744">
+    <title>SwipeCard Live | MVP</title>
+    <meta name="description" content="SwipeCard Liveの閲覧・Live操作・簡易CMSを1画面で試すMVPです。">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">SwipeCard Live MVP</p>
+                <h1>対面プレゼン用Web名刺</h1>
+            </div>
+            <nav class="mode-tabs" aria-label="表示モード">
+                <button class="mode-tab active" data-mode="preview">閲覧</button>
+                <button class="mode-tab" data-mode="live">Live操作</button>
+                <button class="mode-tab" data-mode="cms">CMS編集</button>
+            </nav>
+        </header>
+
+        <section class="notice">
+            <span>方針</span>
+            縦方向は上下スワイプ。横展開は横スワイプを使わず、大きなタップボタンで移動します。
+        </section>
+
+        <main class="workspace">
+            <section class="phone-frame" aria-label="相手が見るSwipeCard画面">
+                <div class="phone-toolbar">
+                    <span id="deckTitleLabel">SwipeCard Demo</span>
+                    <span id="liveStatusLabel" class="status-pill">自由閲覧</span>
+                </div>
+                <div id="deckViewport" class="deck-viewport" tabindex="0"></div>
+            </section>
+
+            <aside class="side-panel" id="livePanel" hidden>
+                <div class="panel-card">
+                    <h2>Live操作</h2>
+                    <p class="panel-help">対面プレゼン中に、相手画面を指定ページへ追従させる想定です。MVPでは同じブラウザ内の別タブ同期で確認します。</p>
+                    <div class="control-grid">
+                        <button class="primary-action" id="startLiveButton">Live開始</button>
+                        <button id="endLiveButton">Live終了</button>
+                        <button id="prevPageButton">前へ</button>
+                        <button id="nextPageButton">次へ</button>
+                        <button id="firstPageButton">最初へ</button>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <h3>ページ指定</h3>
+                    <div id="pageControlList" class="page-control-list"></div>
+                </div>
+                <div class="panel-card">
+                    <h3>共有URL</h3>
+                    <p class="panel-help">本番ではQRコード化します。今は別タブで開いて同期確認します。</p>
+                    <code id="viewerUrlText"></code>
+                </div>
+            </aside>
+
+            <aside class="side-panel" id="cmsPanel" hidden>
+                <div class="panel-card">
+                    <h2>簡易CMS</h2>
+                    <p class="panel-help">まずは完成WebP背景＋テキスト重ねを想定した編集です。画像生成や切り出しは外部ツールで行います。</p>
+                    <label>
+                        編集ページ
+                        <select id="cmsPageSelect"></select>
+                    </label>
+                    <div class="inline-fields">
+                        <label>
+                            縦段 group
+                            <input id="cmsGroupInput" type="text" placeholder="例: 2">
+                        </label>
+                        <label>
+                            表示ラベル
+                            <input id="cmsLabelInput" type="text" placeholder="例: 2-1">
+                        </label>
+                    </div>
+                    <label>
+                        背景画像を選択
+                        <select id="cmsBackgroundSelect"></select>
+                    </label>
+                    <label>
+                        背景画像URL（直接指定）
+                        <input id="cmsBackgroundInput" type="text" placeholder="../shared/.../page.webp">
+                    </label>
+                    <label>
+                        title
+                        <input id="cmsTitleInput" type="text">
+                    </label>
+                    <div class="inline-fields">
+                        <label>
+                            タイトルサイズ px
+                            <input id="cmsTitleSizeInput" type="number" min="18" max="160" step="1">
+                        </label>
+                        <label>
+                            本文サイズ px
+                            <input id="cmsBodySizeInput" type="number" min="12" max="120" step="1">
+                        </label>
+                    </div>
+                    <label>
+                        body
+                        <textarea id="cmsBodyInput" rows="5"></textarea>
+                    </label>
+                    <label>
+                        band
+                        <textarea id="cmsBandInput" rows="3"></textarea>
+                    </label>
+                    <div class="inline-fields">
+                        <label>
+                            bandサイズ px
+                            <input id="cmsBandSizeInput" type="number" min="12" max="120" step="1">
+                        </label>
+                        <label>
+                            memoサイズ px
+                            <input id="cmsMemoSizeInput" type="number" min="12" max="120" step="1">
+                        </label>
+                    </div>
+                    <label>
+                        memo
+                        <textarea id="cmsMemoInput" rows="3"></textarea>
+                    </label>
+                    <label class="check-field">
+                        <input id="cmsCtaEnabledInput" type="checkbox">
+                        CTAを表示する
+                    </label>
+                    <label>
+                        CTAラベル
+                        <input id="cmsCtaLabelInput" type="text">
+                    </label>
+                    <label>
+                        CTA URL
+                        <input id="cmsCtaUrlInput" type="url">
+                    </label>
+                    <button class="primary-action" id="saveCmsButton">このページを保存</button>
+                    <button id="addPageButton">新しいページを追加</button>
+                    <button id="duplicatePageButton">このページを複製</button>
+                    <button class="danger-action" id="deletePageButton">このページを削除</button>
+                    <button id="resetDemoButton">デモ内容に戻す</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
